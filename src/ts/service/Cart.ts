@@ -10,4 +10,16 @@ export default class Cart {
     get items(): Buyable[] {
         return [...this._items]; 
     }
+
+    calculateCost(): number {
+        return this._items.reduce((sum, item) => sum + item.price, 0)
+    }
+
+    calculateCostWithDiscount(discount: number): number {
+        return this.calculateCost() * (1 - discount / 100);
+    }
+
+    remove(id: number): void {
+        this._items = this._items.filter(item => item.id !== id);
+    }
 }
