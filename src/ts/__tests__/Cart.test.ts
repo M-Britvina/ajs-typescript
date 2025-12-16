@@ -2,6 +2,7 @@ import Cart from '../service/Cart';
 import Book from '../domain/Book';
 import Movie from '../domain/Movie';
 import MusicAlbum from '../domain/MusicAlbum';
+import Phone from '../domain/Phone';
 
 test('new card should be empty', () => {
   const cart = new Cart();
@@ -15,15 +16,21 @@ test('add to cart', () => {
   const book = new Book(1001, 'War and Piece', 'Leo Tolstoy', 2000, 1225);
   const musicAlbum = new MusicAlbum(1008, 'Meteora', 'Linkin Park', 900);
   const movie = new Movie(3, "Мстители", 300, "The avengers", "США", "Avengers Assemble!", ["фантастика", "боевик", "фэнтези", "приключения"], 137);
+  const phone = new Phone(4, "NonamePhone mk3", 10000);
   
   cart.add(book);
   cart.add(musicAlbum);
   cart.add(movie);
+  cart.add(phone);
   
-  expect(cart.items.length).toBe(3);
+  expect(cart.items.length).toBe(4);
   expect(cart.items[0]).toEqual(book);
   expect(cart.items[1]).toEqual(musicAlbum);
   expect(cart.items[2]).toEqual(movie);
+  expect(cart.items[3]).toEqual(phone);
+  expect(cart.items[3].quantity).toEqual(1);
+  cart.add(phone);
+  expect(cart.items[3].quantity).toEqual(2);
 
 });
 
@@ -33,12 +40,14 @@ test('calculate cost', () => {
   const book = new Book(1001, 'War and Piece', 'Leo Tolstoy', 2000, 1225);
   const musicAlbum = new MusicAlbum(1008, 'Meteora', 'Linkin Park', 900);
   const movie = new Movie(3, "Мстители", 300, "The avengers", "США", "Avengers Assemble!", ["фантастика", "боевик", "фэнтези", "приключения"], 137);
+  const phone = new Phone(4, "NonamePhone mk3", 10000, 2);
   
   cart.add(book);
   cart.add(musicAlbum);
   cart.add(movie);
+  cart.add(phone);
   
-  expect(cart.calculateCost()).toBe(3200);
+  expect(cart.calculateCost()).toBe(23200);
 
 });
 
@@ -48,12 +57,14 @@ test('calculate discounting cost', () => {
   const book = new Book(1001, 'War and Piece', 'Leo Tolstoy', 2000, 1225);
   const musicAlbum = new MusicAlbum(1008, 'Meteora', 'Linkin Park', 900);
   const movie = new Movie(3, "Мстители", 300, "The avengers", "США", "Avengers Assemble!", ["фантастика", "боевик", "фэнтези", "приключения"], 137);
-  
+  const phone = new Phone(4, "NonamePhone mk3", 10000, 2);
+
   cart.add(book);
   cart.add(musicAlbum);
   cart.add(movie);
+  cart.add(phone);
   
-  expect(cart.calculateCostWithDiscount(10)).toBe(2880);
+  expect(cart.calculateCostWithDiscount(10)).toBe(20880);
 });
 
 test('remove item', () => {
@@ -71,4 +82,28 @@ test('remove item', () => {
   cart.remove(300);
   expect(cart.items.length).toBe(2);
   expect(cart.items.indexOf(movie)).toBe(-1);
+});
+
+test('decrease quantity', () => {
+  const cart = new Cart();
+
+  const book = new Book(1001, 'War and Piece', 'Leo Tolstoy', 2000, 1225);
+  const musicAlbum = new MusicAlbum(1008, 'Meteora', 'Linkin Park', 900);
+  const movie = new Movie(300, "Мстители", 300, "The avengers", "США", "Avengers Assemble!", ["фантастика", "боевик", "фэнтези", "приключения"], 137);
+  const phone = new Phone(4, "NonamePhone mk3", 10000, 2);
+  
+  cart.add(book);
+  cart.add(musicAlbum);
+  cart.add(movie);
+  cart.add(phone);
+  
+  expect(cart.items.length).toBe(4);
+  expect(cart.items.find(item => item.id === 4)?.quantity).toBe(2);
+  cart.decreaseQuantity(4);
+  expect(cart.items.length).toBe(4);
+  expect(cart.items.find(item => item.id === 4)?.quantity).toBe(1);
+  cart.decreaseQuantity(4);
+  expect(cart.items.length).toBe(3);
+  expect(cart.items.indexOf(phone)).toBe(-1);
+
 });
